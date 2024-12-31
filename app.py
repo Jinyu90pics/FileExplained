@@ -84,5 +84,7 @@ def upload_file():
         # 返回转换后的 Markdown 内容
         return jsonify({"markdown": res.text_content})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+if __name__ == "__main__":
+    debug = os.getenv("FLASK_DEBUG", False)
+    app.run(host='0.0.0.0', port=5000, debug= debug)
