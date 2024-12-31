@@ -5,8 +5,11 @@ from flask import Flask, request, render_template, jsonify, redirect
 # from googleapiclient.discovery import build
 # from google.auth.oauthlib.flow import InstalledAppFlow
 # from google.auth.transport.requests import Request
-from google.auth import exceptions
-import pickle
+# from google.auth import exceptions
+# import pickle
+from openai import OpenAI
+
+from constants import OPENAI_KEY
 
 app = Flask(__name__)
 
@@ -69,7 +72,8 @@ def upload_file():
         
         # 使用 markitdown 库将 HTML 转换为 Markdown
         try:
-            mk = MarkItDown()
+            client = OpenAI(api_key= OPENAI_KEY)
+            mk = MarkItDown(llm_client= client, llm_model= "gpt-4o")
             res = mk.convert(file_path)
         except Exception as e:
             return jsonify({"error": f"Conversion failed: {str(e)}"}), 500

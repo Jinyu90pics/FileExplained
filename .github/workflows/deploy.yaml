@@ -1,0 +1,51 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 设置 Google Cloud CLI
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA . -f Dockerfile
+        id: Build
+
+      # 推送 Docker 镜像到 Google Container Registry
+      - name: Push Docker image
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA
+
+      # 部署到 Google Cloud Run
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy flask-app \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --port=80 \
+            --set-env-vars OPENAI_KEY=${{ secrets.OPENAI_KEY }}
+
+      # 部署地址
+      - name: 'URL Deployed'
+        run: 'curl "${{ steps.deploy.outputs.url }}"'
