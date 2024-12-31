@@ -29,13 +29,13 @@ jobs:
 
       - name: Build
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA . -f Dockerfile
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:${{ github.sha }} . -f Dockerfile
         id: Build
 
       # 推送 Docker 镜像到 Google Container Registry
       - name: Push Docker image
         run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:${{ github.sha }}
 
       # 部署到 Google Cloud Run
       - name: Deploy to Google Cloud Run
@@ -43,7 +43,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: flask-app
-          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:${{ github.sha }}
           region: us-central1
           timeout: 15m
           env_vars: OPENAI_KEY=${{ secrets.OPENAI_KEY }}
