@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>Upload File to Convert to Markdown</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="result">
+        <h2>Converted Markdown:</h2>
+        <pre id="markdown-content"></pre>
+    </div>
+
+    <script>
+        // 上传文件并显示返回的 Markdown 内容
+        const form = document.querySelector('form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.markdown) {
+                document.getElementById('markdown-content').textContent = data.markdown;
+            } else {
+                document.getElementById('markdown-content').textContent = 'Error: ' + (data.error || 'Unknown error');
+            }
+        };
+    </script>
+</body>
+</html>

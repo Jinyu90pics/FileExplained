@@ -1,0 +1,7 @@
+Flask==2.2.3
+google-auth==2.20.0
+google-auth-oauthlib==0.4.6
+google-auth-httplib2==0.1.0
+google-api-python-client==2.84.0
+markitdown==0.2.0
+werkzeug==2.2.3
