@@ -39,6 +39,7 @@ jobs:
 
       # 部署到 Google Cloud Run
       - name: Deploy to Google Cloud Run
+        id: deploy
         run: |
           gcloud run deploy flask-app \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/flask-app:$GITHUB_SHA \
